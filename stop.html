@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      background-color: #f2f2f2;
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: #1c354f;
+      color: #fff;
+      padding: 20px;
+      font-size: 1.5em;
+      z-index: 1000;
+    }
+
+    main {
+      margin-top: 80px; /* Adjusted margin-top to accommodate fixed header */
+    }
+
+    #stopwatch {
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+
+    #buttons {
+      margin-bottom: 20px;
+    }
+
+    button {
+      font-size: 1em;
+      padding: 10px 20px;
+      margin: 0 5px;
+      cursor: pointer;
+    }
+
+    #startPause {
+      background-color: #2ecc71;
+      color: #fff;
+      transition: background-color 0.3s;
+    }
+
+    #split {
+      background-color: #e67e22;
+      color: #fff;
+    }
+
+    #reset {
+      background-color: #3498db;
+      color: #fff;
+    }
+
+    #splitBox {
+      border: 1px solid #34495e;
+      padding: 10px;
+      width: 80%;
+      max-width: 600px;
+      margin: 0 auto;
+      overflow-y: auto;
+    }
+
+    .splitTime {
+      margin-bottom: 10px;
+      border: 1px solid #34495e;
+      background-color: rgb(32, 42, 86);
+      padding: 10px;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .splitTime button {
+      background-color: #e74c3c;
+      color: #fff;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+
+    .splitTime button:hover {
+      background-color: #c0392b;
+    }
+
+    .hours {
+      font-size: 2.2em;
+    }
+
+    .minutes {
+      font-size: 1.9em;
+    }
+
+    .seconds {
+      font-size: 1.2em;
+    }
+
+    .milliseconds {
+      font-size: 1em;
+    }
+  </style>
+  <title>Stopwatch</title>
+</head>
+<body>
+
+  <header>
+    Stopwatch
+  </header>
+
+  <main>
+    <div id="stopwatch">
+      <span class="hours">00</span>:
+      <span class="minutes">00</span>:
+      <span class="seconds">00</span>:
+      <span class="milliseconds">000</span>
+    </div>
+
+    <div id="buttons">
+      <button id="startPause" onclick="startPause()">Start</button>
+      <button id="split" onclick="split()">Split</button>
+      <button id="reset" onclick="reset()">Reset</button>
+    </div>
+
+    <div id="splitBox">
+      <!-- Split times will be added here dynamically -->
+    </div>
+  </main>
+
+  <script>
+    let startTime, elapsedTime = 0, timerInterval;
+    const stopwatchElement = document.getElementById('stopwatch');
+    const hoursElement = document.querySelector('.hours');
+    const minutesElement = document.querySelector('.minutes');
+    const secondsElement = document.querySelector('.seconds');
+    const millisecondsElement = document.querySelector('.milliseconds');
+    const startPauseButton = document.getElementById('startPause');
+    const splitButton = document.getElementById('split');
+    const resetButton = document.getElementById('reset');
+    const splitBox = document.getElementById('splitBox');
+
+    function startPause() {
+      if (startPauseButton.innerText === 'Start') {
+        startPauseButton.innerText = 'Pause';
+        startPauseButton.style.backgroundColor = '#27ae60';
+        startTime = new Date().getTime() - elapsedTime;
+        timerInterval = setInterval(updateTime, 10);
+      } else {
+        startPauseButton.innerText = 'Start';
+        startPauseButton.style.backgroundColor = '#2ecc71';
+        clearInterval(timerInterval);
+        elapsedTime = new Date().getTime() - startTime;
+      }
+    }
+
+    function updateTime() {
+      const currentTime = new Date().getTime();
+      elapsedTime = currentTime - startTime;
+      updateDisplay();
+    }
+
+    function updateDisplay() {
+      const milliseconds = Math.floor(elapsedTime) % 1000;
+      const seconds = Math.floor(elapsedTime / 1000) % 60;
+      const minutes = Math.floor(elapsedTime / (1000 * 60)) % 60;
+      const hours = Math.floor(elapsedTime / (1000 * 60 * 60));
+
+      hoursElement.innerText = String(hours).padStart(2, '0');
+      minutesElement.innerText = String(minutes).padStart(2, '0');
+      secondsElement.innerText = String(seconds).padStart(2, '0');
+      millisecondsElement.innerText = String(milliseconds).padStart(3, '0');
+    }
+
+    function split() {
+      const splitTimeElement = document.createElement('div');
+      splitTimeElement.className = 'splitTime';
+      splitTimeElement.innerHTML = `<span>${hoursElement.innerText}:${minutesElement.innerText}:${secondsElement.innerText}.${millisecondsElement.innerText}</span><button onclick="deleteSplit(this)">Delete</button>`;
+      splitBox.appendChild(splitTimeElement);
+    }
+
+    function deleteSplit(element) {
+      const splitTimeElement = element.parentNode;
+      splitBox.removeChild(splitTimeElement);
+    }
+
+    function reset() {
+      startPauseButton.innerText = 'Start';
+      startPauseButton.style.backgroundColor = '#2ecc71';
+      clearInterval(timerInterval);
+      elapsedTime = 0;
+      updateDisplay();
+      splitBox.innerHTML = '';
+    }
+  </script>
+
+</body>
+</html>
